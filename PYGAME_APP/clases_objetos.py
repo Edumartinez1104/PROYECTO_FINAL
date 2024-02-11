@@ -60,3 +60,5 @@ class BOLA_ENERGIA_1:
         self.vx = vx
         self.vy = vy
         self.sonido =  pg.mixer.Sound(SONIDO_EXPLOSION)
+        self.imagenBola1 = pg.image.load(IMG_BOLA1)
+        self.imagenBola2 = pg.image.load(IMG_BOLA2)
