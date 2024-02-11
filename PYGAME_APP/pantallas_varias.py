@@ -21,7 +21,8 @@ class MENU:
         self.sonido = pg.mixer.Sound(SONIDO_MENU)
 
      def bucle_pantalla(self):
-        while True:
+        game_over = True
+        while game_over:
             pg.mixer.Sound.set_volume(self.sonido, 0.02)
             pg.mixer.Sound.play(self.sonido)
             for evento in pg.event.get():
@@ -46,20 +47,19 @@ class MENU:
 
             pg.display.flip()
 
-
 class PROLOGO1:
     def __init__(self):
         self.pantalla_principal = pg.display.set_mode((ANCHO,ALTO))
         pg.display.set_caption("HISTORIA")
         self.tasa_refresco = pg.time.Clock()
         self.imagenFondo = pg.image.load(IMG_FONDO_NAMEK)
-        self.fuente = pg.font.Font(FUENTE1,25)
+        self.fuente = pg.font.Font(FUENTE1,30)
         self.sonido = pg.mixer.Sound(SONIDO_PROLOGO)
 
     
     def bucle_pantalla(self):
-        
-        while True:
+        game_over = True
+        while game_over:
             pg.mixer.Sound.set_volume(self.sonido,0.02)
             pg.mixer.Sound.play(self.sonido)
             for evento in pg.event.get():
@@ -73,11 +73,14 @@ class PROLOGO1:
                 return "partida"
             
             self.pantalla_principal.blit(self.imagenFondo,(0,0))
-            texto_prologo1 = self.fuente.render("DEBEMOS ENCONTRAR LAS BOLAS DE DRAGON PARA SALVAR LA TIERRA," 
-                                                "SE ENCUENTRAN EN EL PLANETA NAMEK",True,COLOR_BLANCO)
-            self.pantalla_principal.blit(texto_prologo1,(100,ALTO//2))
-            pg.display.flip()
+            texto_prologo1 = self.fuente.render("DEBEMOS ENCONTRAR LAS BOLAS DE DRAGON URGENTEMENTE,",True,COLOR_BLANCO)
+            texto_prologo11 = self.fuente.render("SE ENCUENTRAN EN EL PLANETA NAMEK..",True,COLOR_BLANCO)
+            texto_prologo111 = self.fuente.render("Pulsa 1 para continuar..", True,COLOR_BLANCO)
 
+            self.pantalla_principal.blit(texto_prologo1,(30,450))
+            self.pantalla_principal.blit(texto_prologo11,(140,500))
+            self.pantalla_principal.blit(texto_prologo111,(180,550))
+            pg.display.flip()
 
 class PROLOGO2():
     def __init__(self):
@@ -85,11 +88,11 @@ class PROLOGO2():
         pg.display.set_caption("HISTORIA")
         self.tasa_refresco = pg.time.Clock()
         self.imagenFondo2 = pg.image.load(IMG_FONDO_NAMEKIANOS)
-        self.fuente = pg.font.Font(FUENTE1,25)
+        self.fuente = pg.font.Font(FUENTE1,30)
    
     def bucle_pantalla(self):
-        
-        while True:
+        game_over = True
+        while game_over:
 
             for evento in pg.event.get():
                 if evento.type == pg.QUIT:
@@ -102,12 +105,14 @@ class PROLOGO2():
 
             
             self.pantalla_principal.blit(self.imagenFondo2,(0,0))
-            texto_prologo2 = self.fuente.render("OH NO! Unos namekianos se interponen en tu camino,"
-                                                "esquiva sus ataques para poder llegar a las bolas de dragon",True,COLOR_BLANCO)
-            self.pantalla_principal.blit(texto_prologo2,(200,ALTO//2))
+            texto_prologo2 = self.fuente.render("OH NO! UNOS NAMEKIANOS SE INTERPONEN EN TU CAMINO",True,COLOR_NEGRO)
+            texto_prologo22 = self.fuente.render("ESQUIVA SUS ATAQUES PARA PODER LLEGAR A TU DESTINO",True,COLOR_NEGRO)
+            texto_prologo222 = self.fuente.render("Pulsa 2 para continuar..", True,COLOR_NEGRO)
+            self.pantalla_principal.blit(texto_prologo2,(80,450))
+            self.pantalla_principal.blit(texto_prologo22,(60,500))
+            self.pantalla_principal.blit(texto_prologo222,(90,550))
 
             pg.display.flip()
-
 
 class PROLOGO3():
     def __init__(self):
@@ -120,8 +125,8 @@ class PROLOGO3():
         
    
     def bucle_pantalla(self):
-        
-        while True:
+        game_over = True
+        while game_over:
             pg.mixer.Sound.set_volume(self.sonido,0.02)
             pg.mixer.Sound.play(self.sonido)
             for evento in pg.event.get():
@@ -137,7 +142,7 @@ class PROLOGO3():
 
             self.pantalla_principal.blit(self.imagenFondo3,(0,0))
             texto_prologo3 = self.fuente.render("¡¡¡A POR ELLOS!!!", True, COLOR_BLANCO)
-            self.pantalla_principal.blit(texto_prologo3,(200,ALTO//2))
+            self.pantalla_principal.blit(texto_prologo3,(300,ALTO//2))
 
             pg.display.flip()
                 
