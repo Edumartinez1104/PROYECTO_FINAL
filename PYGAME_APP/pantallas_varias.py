@@ -101,7 +101,7 @@ class PROLOGO2():
             botones = pg.key.get_pressed()
             if botones[pg.K_2]:
                 
-                return "prologo3"
+                return "partida"
 
             
             self.pantalla_principal.blit(self.imagenFondo2,(0,0))
@@ -141,8 +141,10 @@ class PROLOGO3():
 
 
             self.pantalla_principal.blit(self.imagenFondo3,(0,0))
-            texto_prologo3 = self.fuente.render("¡¡¡A POR ELLOS!!!", True, COLOR_BLANCO)
-            self.pantalla_principal.blit(texto_prologo3,(300,ALTO//2))
+            texto_prologo3 = self.fuente.render("¡¡¡A POR ELLOS!!!", True, COLOR_NEGRO)
+            texto_prologo33 = self.fuente.render("¡¡Pulsa 3 para comenzar!!", True, COLOR_NEGRO)
+            self.pantalla_principal.blit(texto_prologo3,(300,500))
+            self.pantalla_principal.blit(texto_prologo33,(200,550))
 
             pg.display.flip()
                 
