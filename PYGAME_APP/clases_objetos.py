@@ -2,110 +2,89 @@ from .utils import *
 import random
 
 
-class GOKU_NUBE:
-    def __init__(self,pos_x,pos_y,color=COLOR_BLANCO,w=30,h=110,vy=5):
-        self.pos_x = pos_x
-        self.pos_y = pos_y
-        self.color = color
-        self.w = w
-        self.h = h
-        self.vy = vy
-        self.Goku = pg.image.load(IMG_GOKU)
-        self._direccion = ''
+class Goku_nube(pg.sprite.Sprite):
+    def __init__(self, pantalla):
+        super().__init__()
+        self.pantalla = pantalla
+        self.image = pg.image.load("PYGAME_APP/images/GOKU/GOKU_NUBE22.png")
+        self.rect = self.image.get_rect()
+        self.rect.left = 0
+        self.rect.centery = pantalla.get_height() // 2
+        self.vidas = 3
+        self.speed = 5
 
+    def update(self, dy):
 
-    @property
-    def direccion(self):
-        return self._direccion
-    
-    @direccion.setter
-    def direccion(self,valor):
-        self._direccion = valor
+        self.rect.y += dy * self.speed  
+        if self.rect.top < 0:
+            self.rect.top = 0
+        elif self.rect.bottom > self.pantalla.get_height():
+            self.rect.bottom = self.pantalla.get_height()
 
-    def dibujar(self,surface):
-        surface.blit(self.Goku, (self.pos_x - (self.w // 2), self.pos_y - (self.h // 2)))
+    def dibujar(self):
+        self.pantalla.blit(self.image, self.rect)
 
-    def mover(self,teclado_arriba,teclado_abajo,y_max= ALTO, y_min=ALTO_MIN):
-        estado_teclado = pg.key.get_pressed()
-
-        if estado_teclado[teclado_arriba] == True and self.pos_y > y_min+(self.h//2):
-            self.pos_y -= 1
-            self.vy = 5
-        if estado_teclado[teclado_abajo] == True and self.pos_y < y_max-(self.h//2):
-            self.pos_y += 1
-            self.vy = 5
-
-
-    @property
-    def derecha(self):
-        return self.pos_x + (self.w//2)
-    
-    @property
-    def izquierda(self):
-        return self.pos_x - (self.w//2)  
-    
-    @property
-    def arriba(self):
-        return self.pos_y - (self.h//2)
-    
-    @property
-    def abajo(self):
-        return self.pos_y + (self.h//2) 
-    
-
- 
-class Bola1:
-    def __init__(self,pos_x, pos_y,color=COLOR_BLANCO,radio=1):
-            self.pos_x = pos_x
-            self.pos_y = pos_y
-            self.color = color
-            self.radio = radio
-            self.vx = random.randint(1,2)
-            self.vy = random.randint(1,2)
-            self.sonido = pg.mixer.Sound(SONIDO_EXPLOSION)
-            self.pelota = pg.image.load(IMG_BOLA2)
-
-
-    def dibujar(self,surface):
- 
-        surface.blit(self.pelota,(self.pos_x,self.pos_y) )   
-         
-
-    
-    
     def mover(self):
-        self.pos_x -= self.vx
+        botones = pg.key.get_pressed()
+        if botones[pg.K_UP]:
+            self.update(-1)
+        if botones[pg.K_DOWN]:
+            self.update(1)
+
+
+    def Vidas(self,surface):
+
+        CORAZON = pg.image.load(IMG_CORAZON)
+        x = 15
+        y = 15
         
-        if self.pos_x + self.radio <= -100:
-            self.pos_x = ANCHO
-            self.pos_y = random.randint(0,550)
-            self.vx = random.randint(1,2)
-            self.vy = random.randint(1,2)
+        for _ in range(self.vidas):
+            surface.blit(pg.transform.scale(CORAZON, (CORAZON_ANCHO, CORAZON_ALTO)), (x, y))
+            x += CORAZON_ANCHO + 5
 
 
-class Bola2:
-    def __init__(self,pos_x, pos_y,color=COLOR_BLANCO,radio=1):
-            self.pos_x = pos_x
-            self.pos_y = pos_y
-            self.color = color
-            self.radio = radio
-            self.vx = random.randint(1,2)
-            self.vy = random.randint(1,2)
-            self.sonido = pg.mixer.Sound(SONIDO_EXPLOSION)
-            self.pelota = pg.image.load(IMG_BOLA1)
-
-
-    def dibujar(self,surface):
- 
-        surface.blit(self.pelota,(self.pos_x,self.pos_y) )   
-         
 
     
-    def mover(self):
-        self.pos_x -= self.vx
-        
-        if self.pos_x + self.radio <= -100:
-            self.pos_x = ANCHO
-            self.pos_y = random.randint(0,515)
-            self.vx = random.randint(1,2)
-            self.vy = random.randint(1,2)
+class Obstaculos(pg.sprite.Sprite):
+    def __init__(self, screen_width, screen_height):
+            super().__init__()
+            self.image_choices = ["PYGAME_APP/images/BOLAS/BOLA_ENERGIA00.png", "PYGAME_APP/images/BOLAS/BOLA_ROJA00.png"]
+            self.image = pg.image.load(random.choice(self.image_choices))
+            self.rect = self.image.get_rect()
+            self.rect.x = screen_width
+            self.rect.y = random.randint(0, screen_height - self.rect.height)
+            self.speed = random.randint(2, 6)
+            
+
+    def update(self):
+        self.rect.x -= self.speed 
+
+
+class Explosion(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.images = []
+        for i in range(1, 6):
+            img = pg.image.load(f"PYGAME_APP/images/EXPLOSION/EXPLOSION.png")
+            img = pg.transform.scale(img, (64, 64))
+            self.images.append(img)
+        self.index = 0
+        self.image = self.images[self.index]
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.counter = 0
+        self.sound = pg.mixer.Sound("PYGAME_APP/songs/SONIDO_COLISION.mp3")
+        self.sound.set_volume(0.3)
+        self.sound.play()
+
+    def update(self):
+        self.counter += 1
+        if self.counter % 3 == 0:
+            self.index += 1
+            if self.index >= len(self.images):
+                self.kill()
+            else:
+                self.image = self.images[self.index]
+
+
+

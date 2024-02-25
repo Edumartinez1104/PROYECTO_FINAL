@@ -1,5 +1,6 @@
-from PYGAME_APP.clases_objetos import GOKU_NUBE, Bola1, Bola2
+from PYGAME_APP.clases_objetos import Goku_nube, Obstaculos,Explosion
 from PYGAME_APP.utils import *
+import random
 
 
 class Menu:
@@ -9,6 +10,7 @@ class Menu:
         self.tasa_refresco = pg.time.Clock()
         self.sonido = pg.mixer.Sound(SONIDO_MENU)
         self.imagenFondo = pg.image.load(IMG_FONDO_MENU)
+        
         
 
     def bucle_pantalla(self):
@@ -70,51 +72,106 @@ class Prologo:
 
 class Partida:
     def __init__(self):
-        self.pantalla_principal = pg.display.set_mode((ANCHO,ALTO))
-        pg.display.set_caption("Final")
+        self.pantalla_principal = pg.display.set_mode((ANCHO, ALTO))
+        pg.display.set_caption("Partida")
         self.tasa_refresco = pg.time.Clock()
         self.imagenFondo = pg.image.load(IMG_TERRENO_JUEGO1)
+        self.imagenFondo2 = pg.image.load(IMG_TERRENO_JUEGO2)
+        self.goku = Goku_nube(self.pantalla_principal)
+        self.grupo_bolas = pg.sprite.Group()
+        self.grupo_explosion = pg.sprite.Group()
+        self.menu = Menu()
+        self.final = Final()
+        self.velocidad_obstaculos = 4
         
-        
-        self.bola = Bola1 (ANCHO,ALTO//2,COLOR_BLANCO)
-        self.bola1 = Bola2 (ANCHO,ALTO//4,COLOR_BLANCO)
-        self.goku = GOKU_NUBE (15, ALTO//2)
-
+       
+       
 
 
     def bucle_pantalla(self):
-        game_over = True
-        self.valor_tasa= self.tasa_refresco.tick()
-        while game_over:
+        game_over = False  
+        self.tiempo_restante = 30
+        self.tiempo_anterior = pg.time.get_ticks()
+        while not game_over and self.tiempo_restante > 0:  
+            self.pantalla_principal.blit(self.imagenFondo, (0, 0))
             for evento in pg.event.get():
                 if evento.type == pg.QUIT:
-                    return True
+                    game_over = True  
+        
+
+
+
+
+
+            self.generar_obstaculos()
+            self.actualizar_pantalla()
+            self.manejar_colisiones()
             
-            self.pantalla_principal.blit(self.imagenFondo,(0,0))
-            self.Vidas()
-            self.goku.dibujar(self.pantalla_principal)
-            self.bola.dibujar(self.pantalla_principal)
-            self.bola1.dibujar(self.pantalla_principal)
-            self.goku.mover(pg.K_UP,pg.K_DOWN)
-            self.bola.mover()
-            self.bola1.mover()
+            self.goku.dibujar()
+            self.goku.mover()
+            self.goku.Vidas(self.pantalla_principal)
+
+            tiempo_actual = pg.time.get_ticks()  # Tiempo actual
+            if tiempo_actual - self.tiempo_anterior >= 1000:  # Actualizar cada segundo
+                self.tiempo_restante -= 1
+                self.tiempo_anterior = tiempo_actual
+
+
+            font = pg.font.Font(FUENTE1, 36)
+            text_surface = font.render(f"Tiempo restante: {self.tiempo_restante}", True, (COLOR_NEGRO))
+            text_rect = text_surface.get_rect(center=(ANCHO // 2, 50))
+            self.pantalla_principal.blit(text_surface, text_rect)
+
             self.tasa_refresco.tick(60)
+            pg.display.flip()
 
-
-
-            pg.display.flip()         
         
-    
+        if self.tiempo_restante <= 0:
+            self.eliminacion_obstaculos()
+            self.final.bucle_pantalla()
 
-    def Vidas(self):
 
-        CORAZON = pg.image.load(IMG_CORAZON)
-        x = 10
-        y = 10
-        
-        for _ in range(3):
-            self.pantalla_principal.blit(pg.transform.scale(CORAZON, (CORAZON_ANCHO, CORAZON_ALTO)), (x, y))
-            x += CORAZON_ANCHO + 5
+
+    def manejar_colisiones(self):
+        colision = pg.sprite.spritecollide(self.goku, self.grupo_bolas, True)
+        if colision:
+            self.goku.vidas -= 1
+            explosion = Explosion(colision[0].rect.centerx, colision[0].rect.centery)
+            self.grupo_explosion.add(explosion)
+            if self.goku.vidas == 0:
+                self.menu.bucle_pantalla()
+                self.reiniciar_juego()
+                return
+
+        for explosion in self.grupo_explosion:
+            explosion.update()
+            self.pantalla_principal.blit(explosion.image, explosion.rect)
+
+    def generar_obstaculos(self):
+        probabilidad_generacion= 2
+
+        if self.tiempo_restante <= 15:
+            probabilidad_generacion = 4
+            self.velocidad_obstaculos += 0.5
+            self.pantalla_principal.blit(self.imagenFondo2,(0,0))
+        if random.randint(0, 100) < probabilidad_generacion:
+            obstaculos = Obstaculos(ANCHO, ALTO)
+            self.grupo_bolas.add(obstaculos)
+
+    def actualizar_pantalla(self):
+        self.grupo_bolas.update()
+        self.grupo_bolas.draw(self.pantalla_principal)
+
+    def reiniciar_juego (self):
+        self.goku.vidas = 3
+        self.grupo_bolas.empty()
+        self.grupo_explosion.empty()
+        self.tiempo_restante = 30
+
+    def eliminacion_obstaculos(self):
+        self.grupo_bolas.empty()
+
+
 
 
 class Final:

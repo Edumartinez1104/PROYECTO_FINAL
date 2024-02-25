@@ -20,13 +20,9 @@ class controlador_pantalla:
             cerrar = self.menu.bucle_pantalla()
             if cerrar == True:
                 break
-            cerrar=self.prologo.bucle_pantalla()   
-            if cerrar == True:
-                pg.mixer.Sound.stop(self.prologo.sonido)
-                self.menu.bucle_pantalla()
-            cerrar = self.partida.bucle_pantalla()
+            cerrar == self.prologo.bucle_pantalla()
             if cerrar == True:
                 break
-            cerrar == self.final.bucle_pantalla()
+            cerrar == self.partida.bucle_pantalla()
             if cerrar == True:
                 break
